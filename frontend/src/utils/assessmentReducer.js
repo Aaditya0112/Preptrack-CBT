@@ -16,6 +16,9 @@ const initialState = {
   showSummary: false,
   examTitle: "",
   showValidationError: false,
+  timeSpent: {}, // per-question seconds
+  initialDuration: 0,
+  elapsedSeconds: 0, // total elapsed for untimed exams
 };
 
 export default function assessmentReducer(state = initialState, action) {
@@ -25,7 +28,18 @@ export default function assessmentReducer(state = initialState, action) {
       const initialAnswers = {};
       questions.forEach(q => { initialAnswers[q.id] = { answer: null, status: QUESTION_STATUS.NOT_VISITED }; });
       if (questions.length > 0) initialAnswers[questions[0].id].status = QUESTION_STATUS.NOT_ANSWERED;
-      return { ...initialState, questions, sections, answers: initialAnswers, timeLeft: durationInSeconds, examTitle, currentSectionId: sections[0]?.id || null, currentQuestionIndex: 0 };
+      // initialize timeSpent map
+      const timeSpent = {};
+      questions.forEach(q => { timeSpent[q.id] = 0; });
+      return { ...initialState, questions, sections, answers: initialAnswers, timeLeft: durationInSeconds, initialDuration: durationInSeconds, examTitle, currentSectionId: sections[0]?.id || null, currentQuestionIndex: 0, timeSpent, elapsedSeconds: 0 };
+    }
+    case 'ADD_TIME': {
+      // payload: { questionId, delta } where delta is seconds to add
+      const { questionId, delta } = action.payload || {};
+      if (!questionId || !delta) return state;
+      const timeSpent = { ...(state.timeSpent || {}) };
+      timeSpent[questionId] = (timeSpent[questionId] || 0) + delta;
+      return { ...state, timeSpent };
     }
     case 'GO_TO_QUESTION': {
       const newIndex = action.payload;
@@ -79,6 +93,10 @@ export default function assessmentReducer(state = initialState, action) {
       return { ...state, answers: newAnswers };
     }
     case 'TICK_TIME': {
+      // If exam is untimed (initialDuration === 0) increment elapsedSeconds so user can see how much time they've spent
+      if ((state.initialDuration || 0) === 0) {
+        return { ...state, elapsedSeconds: (state.elapsedSeconds || 0) + 1 };
+      }
       if (state.timeLeft <= 0) return { ...state, showSummary: true };
       return { ...state, timeLeft: state.timeLeft - 1 };
     }

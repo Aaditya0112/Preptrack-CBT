@@ -28,7 +28,7 @@ export default function SummaryPage() {
 
   const handleFinalSubmit = () => dispatch({ type: 'FINAL_SUBMIT' });
   const handleCancel = () => dispatch({ type: 'TOGGLE_SUMMARY' });
-  const isSubmitted = state.timeLeft <= 0;
+  const isSubmitted = (state.initialDuration || 0) > 0 ? state.timeLeft <= 0 : false;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center p-4">

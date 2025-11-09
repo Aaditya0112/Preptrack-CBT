@@ -30,10 +30,11 @@ export default function Timer() {
     );
   }
 
+  const isUntimed = (state?.initialDuration || 0) === 0;
   return (
     <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg shadow-inner">
-      <span className="text-lg font-semibold text-gray-800">Time Left:</span>
-      <span className="text-lg font-bold text-red-600 tabular-nums">{formatTime(state.timeLeft)}</span>
+      <span className="text-lg font-semibold text-gray-800">{isUntimed ? 'Elapsed' : 'Time Left'}:</span>
+      <span className="text-lg font-bold text-red-600 tabular-nums">{formatTime(isUntimed ? (state.elapsedSeconds || 0) : state.timeLeft)}</span>
     </div>
   );
 }
