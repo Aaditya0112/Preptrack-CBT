@@ -40,10 +40,11 @@ export default function AssessmentPage({ user, exam, onExit }) {
     const navActions = new Set(['GO_TO_QUESTION', 'SAVE_AND_NEXT', 'GO_TO_PREVIOUS', 'MARK_AND_NEXT', 'TOGGLE_SUMMARY']);
     const now = Date.now();
     const delta = Math.round((now - (lastActiveRef.current || now)) / 1000);
+
+    // record per-question elapsed time before navigation or submit
     if (state?.questions?.length && (navActions.has(action.type) || action.type === 'FINAL_SUBMIT')) {
       const currentQ = state.questions[state.currentQuestionIndex];
       if (currentQ && delta > 0) {
-        // record elapsed for current question
         dispatch({ type: 'ADD_TIME', payload: { questionId: currentQ.id, delta } });
       }
       lastActiveRef.current = now;
@@ -51,23 +52,23 @@ export default function AssessmentPage({ user, exam, onExit }) {
 
     if (action.type === 'FINAL_SUBMIT') {
       try {
-        // Build payload including latest timeSpent (we added the delta above synchronously)
-        // compute an updated timeSpent object that includes the delta we just recorded
         const timeSpentUpdated = { ...(state.timeSpent || {}) };
         const currentQId = state.questions?.[state.currentQuestionIndex]?.id;
         if (currentQId && delta > 0) {
           timeSpentUpdated[currentQId] = (timeSpentUpdated[currentQId] || 0) + delta;
         }
+
         const payload = {
           examTitle: state.examTitle,
           answers: state.answers,
           timeSpent: timeSpentUpdated,
           timeLeft: state.timeLeft,
           elapsedSeconds: (state.elapsedSeconds || 0) + ((state.initialDuration || 0) === 0 ? delta : 0),
+          initialDuration: state.initialDuration || 0,
         };
 
-        // Attempt to send submission to backend endpoint
         try {
+          // send to backend
           // await fetch('/api/submit', {
           //   method: 'POST',
           //   headers: { 'Content-Type': 'application/json' },
@@ -87,6 +88,7 @@ export default function AssessmentPage({ user, exam, onExit }) {
     }
   }
 
+  // initialize exam into reducer when selectedExam becomes available
   useEffect(() => {
     if (selectedExam) {
       dispatch({ type: 'INITIALIZE_EXAM', payload: { questions: selectedExam.questions, sections: selectedExam.sections, durationInSeconds: selectedExam.durationInSeconds, examTitle: selectedExam.examTitle } });

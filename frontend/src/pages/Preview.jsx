@@ -47,6 +47,7 @@ export default function Preview() {
   const questions = exam?.questions || [];
   const [selected, setSelected] = useState(() => new Set(questions.map((q) => q.id)) );
   const [timed, setTimed] = useState(true);
+  const [timeMinutes, setTimeMinutes] = useState(() => exam?.durationInSeconds ? Math.round(exam.durationInSeconds / 60) : 180);
   const [rangeText, setRangeText] = useState('');
   const [selectionMode, setSelectionMode] = useState('all'); // 'all' or 'customized'
   // section selection state: start with all sections selected.
@@ -66,11 +67,21 @@ export default function Preview() {
     return ids.map((id, idx) => ({ id, name: `Section ${idx + 1}` }));
   }, [exam, questions]);
 
+  // helper: how many available sections are currently selected
+  const selectedSectionCount = React.useMemo(() => {
+    if (!availableSections || availableSections.length === 0) return 0;
+    return availableSections.filter(s => selectedSections.has(s.id)).length;
+  }, [availableSections, selectedSections]);
+
   // recompute filtered questions when selectedSections or full questions list changes
   const filteredQuestions = React.useMemo(() => {
-    if (!selectedSections || selectedSections.size === 0) return questions.slice();
-    if (selectedSections.has('__all__')) return questions.slice();
-    return questions.filter(q => selectedSections.has(q.sectionId));
+    // If we have explicit available sections and none are selected, return empty (user must pick a section)
+    if (availableSections && availableSections.length > 0) {
+      if (!selectedSections || selectedSections.size === 0) return [];
+      return questions.filter(q => selectedSections.has(q.sectionId));
+    }
+    // No section metadata available -> return all questions
+    return questions.slice();
   }, [questions, selectedSections]);
 
   // auto-parse rangeText and update `selected` automatically (works on filteredQuestions)
@@ -78,7 +89,10 @@ export default function Preview() {
     const text = (rangeText || '').trim();
     if (text === '') {
       // empty input -> keep all selected (unless customized mode)
-      if (selectionMode === 'all') setSelected(new Set(filteredQuestions.map((q) => q.id)));
+      // Only auto-select if there are visible questions
+      if (selectionMode === 'all' && filteredQuestions.length > 0) {
+        setSelected(new Set(filteredQuestions.map((q) => q.id)));
+      }
       return;
     }
 
@@ -106,8 +120,8 @@ export default function Preview() {
       const allowed = new Set(filteredQuestions.map(q => q.id));
       const next = new Set();
       for (const id of prev) if (allowed.has(id)) next.add(id);
-      // if nothing remains selected, default to selecting all filtered questions
-      if (next.size === 0) filteredQuestions.forEach(q => next.add(q.id));
+      // if nothing remains selected, default to selecting all filtered questions only if there are visible questions
+      if (next.size === 0 && filteredQuestions.length > 0) filteredQuestions.forEach(q => next.add(q.id));
       return next;
     });
   }, [filteredQuestions]);
@@ -148,10 +162,10 @@ export default function Preview() {
       alert('Please select at least one question');
       return;
     }
-    const selectedQs = questions.filter((q) => selected.has(q.id));
+  const selectedQs = questions.filter((q) => selected.has(q.id));
     // pass only the selected sections metadata as well
   const selectedSectionObjs = availableSections.filter(s => selectedSections.has(s.id));
-    const examForRun = { ...exam, questions: selectedQs, sections: selectedSectionObjs, durationInSeconds: timed ? exam.durationInSeconds : 0 };
+  const examForRun = { ...exam, questions: selectedQs, sections: selectedSectionObjs, durationInSeconds: timed ? timeMinutes * 60 : 0 };
     // navigate to assessment with exam object in state
     navigate('/assessment', { state: { exam: examForRun } });
   };
@@ -172,19 +186,28 @@ export default function Preview() {
             <h1 className="text-2xl font-bold text-gray-800">{exam.examTitle || 'Preview Exam'}</h1>
             <p className="text-sm text-gray-500 mt-1">Preview questions and select a subset to run. Duration: {exam.durationInSeconds ? `${Math.floor(exam.durationInSeconds/60)} min` : 'Untimed'}</p>
           </div>
-          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
             <div className="text-sm text-gray-600">Questions shown</div>
             <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">{filteredQuestions.length}</div>
-            <button onClick={() => { selectAll(); }} className="px-4 py-2 bg-green-600 text-white rounded shadow">Select All</button>
-            <button onClick={() => { clearAll(); }} className="px-4 py-2 bg-gray-100 text-gray-700 rounded border">Clear</button>
+            <button onClick={() => { selectAll(); }} className={`px-4 py-2 text-white rounded shadow ${filteredQuestions.length === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-600'}`} disabled={filteredQuestions.length === 0}>Select All</button>
+            <button onClick={() => { clearAll(); }} className={`px-4 py-2 ${filteredQuestions.length === 0 ? 'bg-gray-100 text-gray-400' : 'bg-gray-100 text-gray-700'} rounded border`} disabled={filteredQuestions.length === 0}>Clear</button>
           </div>
         </header>
 
         <div className="flex-1 grid grid-cols-3 gap-6">
-          <div className="col-span-2 bg-white rounded-lg shadow divide-y overflow-auto" style={{ maxHeight: '100%' }}>
-            {filteredQuestions.map((q, idx) => (
-              <QuestionCard key={q.id} q={q} idx={idx} checked={selected.has(q.id)} onToggle={toggle} />
-            ))}
+          <div className="col-span-2 bg-white rounded-lg shadow divide-y overflow-auto flex items-center justify-center" style={{ maxHeight: '100%' }}>
+            {filteredQuestions.length === 0 ? (
+              <div className="p-8 text-center">
+                <div className="text-red-600 font-semibold mb-2">No sections Selected to Proceed</div>
+                <div className="text-sm text-gray-600">Select one or more sections from the right to preview questions and enable selection controls.</div>
+              </div>
+            ) : (
+              <div className="w-full">
+                {filteredQuestions.map((q, idx) => (
+                  <QuestionCard key={q.id} q={q} idx={idx} checked={selected.has(q.id)} onToggle={toggle} />
+                ))}
+              </div>
+            )}
           </div>
 
           <aside className="col-span-1 sticky top-6 bg-white rounded-lg shadow p-5 h-fit">
@@ -205,7 +228,11 @@ export default function Preview() {
             <div className="mb-4">
               <label className="block text-sm text-gray-600 mb-2">Questions to include</label>
               <div className="flex items-center gap-3">
-                <select value={selectionMode} onChange={(e) => { setSelectionMode(e.target.value); if (e.target.value === 'all') { setRangeText(''); selectAll(); } }} className="border p-2 rounded w-28">
+                <select value={selectionMode} onChange={(e) => {
+                    const val = e.target.value;
+                    setSelectionMode(val);
+                    if (val === 'all' && filteredQuestions.length > 0) { setRangeText(''); selectAll(); }
+                  }} className="border p-2 rounded w-28" disabled={filteredQuestions.length === 0}>
                   <option value="all">All</option>
                   <option value="customized">Customized</option>
                 </select>
@@ -226,10 +253,15 @@ export default function Preview() {
                       }}
                       className="w-full border p-2 rounded"
                       placeholder={`1,2,5-${filteredQuestions.length || questions.length}`}
+                      disabled={filteredQuestions.length === 0}
                     />
                   </div>
                   <div className="mt-2 text-xs text-gray-500">Allowed: digits, comma, hyphen. Examples: 1,3,5-8</div>
                 </div>
+              )}
+
+              {filteredQuestions.length === 0 && (
+                <div className="mt-3 text-sm text-red-600">Please select at least one section to enable question selection.</div>
               )}
             </div>
 
@@ -247,8 +279,22 @@ export default function Preview() {
               <p className="text-xs text-gray-500 mt-1">If untimed, assessment runs without countdown.</p>
             </div>
 
+            {timed && (
+              <div className="mb-4">
+                <label className="block text-sm text-gray-600 mb-2">Set duration (minutes)</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={timeMinutes}
+                  onChange={(e) => setTimeMinutes(Math.max(1, parseInt(e.target.value || '1', 10)))}
+                  className="w-full border p-2 rounded"
+                />
+                <div className="text-xs text-gray-500 mt-1">Default: 180 minutes</div>
+              </div>
+            )}
+
             <div className="mt-6">
-              <button onClick={handleProceed} className="w-full py-2 bg-blue-600 text-white rounded shadow">Proceed to Assessment</button>
+              <button onClick={handleProceed} className={`w-full py-2 text-white rounded shadow ${filteredQuestions.length === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600'}`} disabled={filteredQuestions.length === 0}>Proceed to Assessment</button>
               <button onClick={() => navigate('/dashboard')} className="w-full mt-3 py-2 bg-white text-gray-700 rounded border">Back to Dashboard</button>
             </div>
 
