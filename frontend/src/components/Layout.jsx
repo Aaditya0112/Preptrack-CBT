@@ -7,7 +7,7 @@ export default function Layout() {
   const location = useLocation();
   
   
-  const hideHeaderFooter = ['/assessment', '/'];
+  const hideHeaderFooter = ['/assessment', '/', "/signup"];
   
   const shouldHideHeaderFooter = hideHeaderFooter.includes(location.pathname);
 

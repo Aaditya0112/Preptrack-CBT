@@ -187,19 +187,17 @@ export default function Preview() {
             <p className="text-sm text-gray-500 mt-1">Preview questions and select a subset to run. Duration: {exam.durationInSeconds ? `${Math.floor(exam.durationInSeconds/60)} min` : 'Untimed'}</p>
           </div>
             <div className="flex items-center gap-3">
-            <div className="text-sm text-gray-600">Questions shown</div>
-            <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">{filteredQuestions.length}</div>
-            <button onClick={() => { selectAll(); }} className={`px-4 py-2 text-white rounded shadow ${filteredQuestions.length === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-600'}`} disabled={filteredQuestions.length === 0}>Select All</button>
-            <button onClick={() => { clearAll(); }} className={`px-4 py-2 ${filteredQuestions.length === 0 ? 'bg-gray-100 text-gray-400' : 'bg-gray-100 text-gray-700'} rounded border`} disabled={filteredQuestions.length === 0}>Clear</button>
-          </div>
+              <div className="text-sm text-gray-600">Questions shown</div>
+              <div className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full font-medium">{filteredQuestions.length}</div>
+            </div>
         </header>
 
         <div className="flex-1 grid grid-cols-3 gap-6">
           <div className="col-span-2 bg-white rounded-lg shadow divide-y overflow-auto flex items-center justify-center" style={{ maxHeight: '100%' }}>
             {filteredQuestions.length === 0 ? (
               <div className="p-8 text-center">
-                <div className="text-red-600 font-semibold mb-2">No sections Selected to Proceed</div>
-                <div className="text-sm text-gray-600">Select one or more sections from the right to preview questions and enable selection controls.</div>
+                <div className="text-red-600 font-semibold mb-2">No Section(s) Selected to Proceed</div>
+                <div className="text-sm text-gray-600">Select one or more sections from the right to preview questions and enable selection.</div>
               </div>
             ) : (
               <div className="w-full">
