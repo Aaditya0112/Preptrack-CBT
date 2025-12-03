@@ -2,6 +2,8 @@ import React, { useMemo, useState, useEffect } from 'react'
 import { EXAM_DATA } from '../data/examData'
 import { EXAM_ATTEMPTS, USER_ANSWERS } from '../data/attemptsData'
 import { BarChart, PieChart } from '@mui/x-charts'
+import MathField from '../components/MathField'
+import QuestionRenderer from '../components/QuestionRenderer'
 
 
 const COLORS = {
@@ -208,6 +210,117 @@ export default function Analysis() {
         </div>
       )}
 
+        {activeTab === 'qwise' && (
+        <div className="bg-white p-4 rounded shadow">
+          <div className="flex items-center gap-4 mb-4">
+            <div>
+              <label className="block text-sm text-gray-600">Select Section</label>
+              <select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)} className="mt-1 p-2 border rounded">
+                {EXAM_DATA.sections.filter(s => attemptedSectionIds.includes(s.sectionId)).map(s => (
+                  <option key={s.sectionId} value={s.sectionId}>{s.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2">
+
+              {sectionQuestions.map((q, idx) => {
+                const ans = answers.find(a => a.questionId === q.questionId)
+                const status = ans ? (ans.isCorrect === true ? 'correct' : (ans.isCorrect === false ? 'wrong' : 'not_answered')) : 'not_answered'
+                const bg = status === 'correct' ? 'bg-green-500' : (status === 'wrong' ? 'bg-red-500' : 'bg-yellow-300')
+                return (
+                  <button key={q.questionId} value= {idx+1} onClick={() => setActiveQuestionId(q.questionId)} className={`${bg} text-white px-3 py-2 rounded`}>
+                    {idx + 1}
+                  </button>
+                )
+              })}
+
+            </div>
+          </div>
+
+          <div className="border-t pt-4">
+            {activeQuestionId ? (
+              (() => {
+                const q = questionMap[activeQuestionId]
+                const ans = answers.find(a => a.questionId === activeQuestionId)
+                const selectedOption = q.options ? q.options.find(o => o.optionId === ans?.selectedOptionId) : null
+                return (
+                  <div>
+                    <div className="mb-2 font-semibold">Q. {q.number}. <QuestionRenderer text={q.questionText} /></div>
+                    {q.type === 'MCQ' ? (
+                      <div className="mb-2">
+                        <div className="text-sm text-gray-600">Options:</div>
+                        <div className="p-3 bg-gray-50 rounded space-y-2">
+                          {q.options && q.options.length ? (
+                            q.options.map((o) => {
+                              const isMarked = ans?.selectedOptionId === o.optionId
+                              const isCorrect = q.correctAnswer?.optionId === o.optionId
+                              return (
+                                <div key={o.optionId} className={`flex items-start gap-3 p-2 rounded ${isMarked ? 'bg-blue-50 border border-blue-200' : 'bg-white'} ${isCorrect ? 'ring-1 ring-green-100' : ''}`}>
+                                  <div className="font-semibold">{o.identifier} —</div>
+                                  <div className="flex-1">
+                                    <MathField latex={o.text || ''} />
+                                  </div>
+                                  <div className="ml-2 text-sm flex items-center gap-2">
+                                    {isMarked && <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded">Marked</span>}
+                                    {isCorrect && <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded">Correct</span>}
+                                  </div>
+                                </div>
+                              )
+                            })
+                          ) : (
+                            <div className="text-gray-600">No options available.</div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mb-2">
+                        <div className="text-sm text-gray-600">Your Answer:</div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          {ans ? (
+                            ans.numericalAnswer ? (
+                              <div className="text-sm font-medium">{ans.numericalAnswer}</div>
+                            ) : (
+                              <span className="text-gray-500">Not Answered</span>
+                            )
+                          ) : (
+                            <span className="text-gray-500">Not Answered</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    <div>
+                      <div className="text-sm text-gray-600">Correct Answer:</div>
+                      <div className="p-3 bg-green-50 rounded">
+                        {q.type === 'MCQ' ? (
+                          (() => {
+                            const correctOpt = q.options?.find(o => o.optionId === q.correctAnswer.optionId)
+                            const correctText = correctOpt?.text || q.correctAnswer.optionId
+                            return (
+                              <div className="flex items-start gap-2">
+                                <div className="font-semibold">{q.correctAnswer.identifier} —</div>
+                                <div className="flex-1">
+                                  <MathField latex={correctText || ''} />
+                                </div>
+                              </div>
+                            )
+                          })()
+                        ) : (
+                          <MathField latex={String(q.correctAnswer.value || '')} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })()
+            ) : (
+              <div className="text-gray-500">Select a question to view details.</div>
+            )}
+          </div>
+        </div>
+      )}
 
 
     </div>

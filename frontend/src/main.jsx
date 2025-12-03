@@ -35,7 +35,10 @@ const router = createBrowserRouter([
       },
       {
         path: "/analysis",
-        element: <Analysis />
+        element: <MathLiveProvider>
+           <Analysis />
+        </MathLiveProvider>
+       
       },
       {
         path : "/assessment",
