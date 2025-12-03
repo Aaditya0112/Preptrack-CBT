@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import Preview from './pages/Preview.jsx'
 import Login from './pages/LoginPage.jsx'
 import Signup from './pages/Signup.jsx'
+import Analysis from './pages/Analysis.jsx'
 import './index.css'
 // import './styles/assessment.css'
 import App from './App.jsx'
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path : "/preview",
         element :<Preview/>
+      },
+      {
+        path: "/analysis",
+        element: <Analysis />
       },
       {
         path : "/assessment",

@@ -82,6 +82,12 @@ export default function AssessmentPage({ user, exam, onExit }) {
         console.error('Error during submit:', err);
       } finally {
         dispatch(action);
+        // navigate to analysis page after final submit
+        try {
+          navigate('/analysis');
+        } catch (e) {
+          console.warn('Navigation to analysis failed', e);
+        }
       }
     } else {
       dispatch(action);
