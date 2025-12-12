@@ -6,12 +6,14 @@ import Preview from './pages/Preview.jsx'
 import Login from './pages/LoginPage.jsx'
 import Signup from './pages/Signup.jsx'
 import Analysis from './pages/Analysis.jsx'
+// import Performance from './pages/Performance.jsx'
 import './index.css'
 // import './styles/assessment.css'
 import App from './App.jsx'
 // import Start from './pages/Start.jsx'
 import MathLiveProvider from './components/MathLiveProvider';
 import Layout from './components/Layout.jsx';
+import Topics from './pages/Topics.jsx'
 // import MathLiveProvider from './components/MathLiveProvider.jsx'
 
 const router = createBrowserRouter([
@@ -35,11 +37,16 @@ const router = createBrowserRouter([
       },
       {
         path: "/analysis",
-        element: <MathLiveProvider>
-           <Analysis />
-        </MathLiveProvider>
-       
+        element: <Analysis />
       },
+      {
+          path: "/topics/:subjectId",
+          element: <Topics />
+        },
+      // {
+      //   path: "/performance",
+      //   element: <Performance />
+      // },
       {
         path : "/assessment",
         element : <App/>

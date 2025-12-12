@@ -40,9 +40,16 @@ function QuestionCard({ q, idx, checked, onToggle }) {
 export default function Preview() {
   const location = useLocation();
   const navigate = useNavigate();
+  // allow passing a full exam object in location.state (topic-level exams) for frontend working purpose only
+  const stateExam = location?.state?.exam;
+  
+  ////
+
+
   const examId = location?.state?.examId || new URLSearchParams(location.search).get('examId');
   const examEntry = EXAMS.find((e) => e.id === examId);
-  const exam = examEntry?.exam;
+  const examFromList = examEntry?.exam;
+  const exam = stateExam || examFromList;
 
   const questions = exam?.questions || [];
   const [selected, setSelected] = useState(() => new Set(questions.map((q) => q.id)) );
