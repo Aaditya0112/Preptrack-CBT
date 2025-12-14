@@ -13,6 +13,7 @@ function Login() {
 
     const {register, handleSubmit} = useForm()
     const [error, setError] = useState("")
+    const [role, setRole] = useState("student") // 'student' or 'teacher'
 
     const login = async () =>{
         setError("")
@@ -47,18 +48,43 @@ function Login() {
                         </span>
                     </div>
                     
-                    <h2 className="text-center text-2xl md:text-3xl font-bold leading-tight text-gray-900 mb-2">
-                        Sign in to your account
-                    </h2>
-                    <p className="mt-2 text-center text-base text-gray-600 mb-6">
-                        Don&apos;t have any account?&nbsp;
-                        <Link
-                            to="/signup"
-                            className="font-medium text-primary transition-all duration-200 hover:underline"
-                        >
-                            Sign Up
-                        </Link>
-                    </p>
+                    <div className="flex flex-col items-center">
+                        <div className="mb-4 w-full flex justify-center">
+                            <div className="inline-flex bg-gray-200 rounded-full p-1 shadow-sm">
+                                <button
+                                    type="button"
+                                    onClick={() => setRole('student')}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${role === 'student' ? 'bg-white text-indigo-600 shadow' : 'text-gray-600'}`}
+                                >
+                                    Student
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setRole('teacher')}
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${role === 'teacher' ? 'bg-white text-indigo-600 shadow' : 'text-gray-600'}`}
+                                >
+                                    Teacher
+                                </button>
+                            </div>
+                        </div>
+
+                        <h2 className="text-center text-2xl md:text-3xl font-bold leading-tight text-gray-900 mb-2">
+                            Sign in as {role === 'student' ? 'Student' : 'Teacher'}
+                        </h2>
+                        <p className="mt-2 text-center text-sm text-gray-500 mb-6 max-w-[380px]">
+                            Use your {role === 'student' ? 'student' : 'teacher'} credentials to access the dashboard.
+                        </p>
+
+                        <p className="mt-2 text-center text-base text-gray-600 mb-6">
+                            Don&apos;t have any account?&nbsp;
+                            <Link
+                                to="/signup"
+                                className="font-medium text-primary transition-all duration-200 hover:underline"
+                            >
+                                Sign Up
+                            </Link>
+                        </p>
+                    </div>
 
                     {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
