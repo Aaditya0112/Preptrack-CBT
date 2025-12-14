@@ -71,19 +71,10 @@ function Login() {
                         <h2 className="text-center text-2xl md:text-3xl font-bold leading-tight text-gray-900 mb-2">
                             Sign in as {role === 'student' ? 'Student' : 'Teacher'}
                         </h2>
-                        <p className="mt-2 text-center text-sm text-gray-500 mb-6 max-w-[380px]">
+                        <p className="mt-2 text-center text-sm text-gray-500 max-w-[380px]">
                             Use your {role === 'student' ? 'student' : 'teacher'} credentials to access the dashboard.
                         </p>
 
-                        <p className="mt-2 text-center text-base text-gray-600 mb-6">
-                            Don&apos;t have any account?&nbsp;
-                            <Link
-                                to="/signup"
-                                className="font-medium text-primary transition-all duration-200 hover:underline"
-                            >
-                                Sign Up
-                            </Link>
-                        </p>
                     </div>
 
                     {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
@@ -119,6 +110,15 @@ function Login() {
                             </Button>
                         </div>
                     </form>
+                    <p className="mt-2 text-center text-base text-gray-600 mb-6">
+                            Don&apos;t have any account?&nbsp;
+                            <Link
+                                to="/signup"
+                                className="font-medium text-primary transition-all duration-200 hover:underline"
+                            >
+                                Sign Up
+                            </Link>
+                        </p>
                 </div>
             </div>
         </div>

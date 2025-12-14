@@ -7,6 +7,8 @@ import Login from './pages/LoginPage.jsx'
 import Signup from './pages/Signup.jsx'
 import Analysis from './pages/Analysis.jsx'
 import Performance from './pages/Performance.jsx'
+import ClassPerformance from './pages/ClassPerformance.jsx'
+import ClassTestDetails from './pages/ClassTestDetails.jsx';
 import './index.css'
 // import './styles/assessment.css'
 import App from './App.jsx'
@@ -27,7 +29,16 @@ const router = createBrowserRouter([
       },{
         path : "/signup",
         element: <Signup/>
-      },{
+      },
+      {
+        path: "/class-performance",
+        element: <ClassPerformance />
+      },
+      {
+        path: "/class-performance/test/:testId",
+        element: <ClassTestDetails />
+      },
+      {
         path : "/dashboard",
         element : <Dashboard/>
       },

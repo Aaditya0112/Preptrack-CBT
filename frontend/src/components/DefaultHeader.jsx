@@ -29,6 +29,12 @@ export default function DefaultHeader() {
             >
               Dashboard
             </Link>
+            <Link
+              to="/performance"
+              className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Performance
+            </Link>
             <button
               onClick={() => navigate('/')}
               className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
