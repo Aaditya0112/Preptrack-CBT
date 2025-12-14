@@ -133,6 +133,9 @@ const subjects = [
             <div className="text-center">
               <span className="font-medium text-sm">Accuracy Trend</span>
             </div>
+            <div className="text-center">
+              <span className="font-medium text-sm text-purple-600">Click To View Details</span>
+            </div>
           </motion.button>
         );
       })}
@@ -142,23 +145,6 @@ const subjects = [
 
 function SubjectRadar({ tests }) {
   // aggregate subject scores (same logic as SubjectGrid)
-const subjects = [
-    {
-        subjectName: "Physics",
-        avgScore: 75,
-        accuracy: 82,
-    },
-    {
-        subjectName: "Chemistry",
-        avgScore: 68,
-        accuracy: 78,
-    },
-    {
-        subjectName: "Mathematics",
-        avgScore: 85,
-        accuracy: 88,
-    },
-];
 
   const categories = ["Physics", "Chemistry", "Mathematics"];
 
