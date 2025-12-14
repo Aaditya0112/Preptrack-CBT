@@ -8,4 +8,12 @@ export default defineConfig({
     react(),
     tailwindcss()
   ],
+  // Ensure Vite pre-bundles framer-motion and the JSX runtime so imports like
+  // "react/jsx-runtime" used by some libraries (framer-motion) resolve correctly.
+  optimizeDeps: {
+    include: ["framer-motion", "react/jsx-runtime"],
+  },
+  resolve: {
+    dedupe: ["react", "react-dom"]
+  },
 })
