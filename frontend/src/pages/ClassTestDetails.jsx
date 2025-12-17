@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { LineChart } from '@mui/x-charts/LineChart';
 import InfoCard from '../components/performance/InfoCard';
+import { Info } from 'lucide-react';
 
 
 // Helper to generate Gaussian distribution points
@@ -38,7 +39,26 @@ export default function ClassTestDetails() {
       { id: 1, value: 45, label: 'Medium', color: '#facc15' },
       { id: 2, value: 25, label: 'Hard', color: '#f87171' },
     ],
+    errorBreakdown: [
+      { id: 0, value: 40, label: 'Easy', color: '#4ade80' },
+      { id: 1, value: 25, label: 'Medium', color: '#facc15' },
+      { id: 2, value: 35, label: 'Hard', color: '#f87171' },
+    ],
   };
+
+  const [showErrorTooltip, setShowErrorTooltip] = useState(false);
+  const errorTooltipRef = useRef(null);
+  const errorBtnRef = useRef(null);
+
+  useEffect(() => {
+    function handleDocClick(e) {
+      if (errorTooltipRef.current && !errorTooltipRef.current.contains(e.target) && errorBtnRef.current && !errorBtnRef.current.contains(e.target)) {
+        setShowErrorTooltip(false);
+      }
+    }
+    document.addEventListener('click', handleDocClick);
+    return () => document.removeEventListener('click', handleDocClick);
+  }, []);
 
   const gaussianData = useMemo(() => 
     generateGaussianData(testData.stats.avg, testData.stats.stdDev), 
@@ -95,6 +115,51 @@ export default function ClassTestDetails() {
           </div>
           <p className="text-center text-sm text-gray-500 mt-2">
             Distribution of questions by difficulty level
+          </p>
+        </div>
+
+        {/* Error Breakdown Pie Chart */}
+        <div className="relative bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Error Breakdown</h3>
+              <button
+                  ref={errorBtnRef}
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      setShowErrorTooltip((s) => !s);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+              >
+                  <Info size={18} />
+              </button>
+          </div>
+
+          {showErrorTooltip && (
+              <div ref={errorTooltipRef} className="absolute top-14 right-6 z-20 w-72 bg-white border rounded-lg shadow-lg p-4 text-sm">
+                  <div className="font-bold mb-2">Where are they losing marks?</div>
+                  <p className="text-gray-600">This chart breaks down the students' wrong answers by difficulty level.</p>
+                  <ul className="list-disc list-inside mt-2 space-y-1">
+                      <li><span className="font-semibold">Large "Easy" Slice:</span> Indicates carelessness. Students may need to slow down and double-check their work.</li>
+                      <li><span className="font-semibold">Large "Hard" Slice:</span> Suggests knowledge gaps in complex topics. Students understand the basics but struggle with advanced concepts.</li>
+                  </ul>
+              </div>
+          )}
+
+          <div className="h-64 w-full flex items-center justify-center">
+              <PieChart
+                  series={[
+                      {
+                          data: testData.errorBreakdown,
+                          highlightScope: { faded: 'global', highlighted: 'item' },
+                          faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                      },
+                  ]}
+                  height={200}
+                  width={400}
+              />
+          </div>
+          <p className="text-center text-sm text-gray-500 mt-2">
+              Breakdown of marks lost by question difficulty
           </p>
         </div>
 

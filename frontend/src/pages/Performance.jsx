@@ -9,16 +9,10 @@ import SubjectAnalysis from "../components/performance/SubjectAnalysis";
 import SnapshotCards from "../components/performance/SnapshotCards";
 import TopicWeakness from "../components/performance/TopicWeakness";
 import {
-  labels,
-  values,
+  performanceData,
   genDummyTests,
-  cards as performanceCards,
-  subjectMetrics as performanceSubjectMetrics,
-  subjectData as performanceSubjectData,
 } from "../data/PerformanceData";
 
-import ToggleButton from "@mui/material/ToggleButton";
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import InfoCard from "../components/performance/InfoCard";
 import LevelBadge from "../components/performance/LevelBadge";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
@@ -134,7 +128,7 @@ const subjects = [
               <span className="font-medium text-sm">Accuracy Trend</span>
             </div>
             <div className="text-center">
-              <span className="font-medium text-sm text-purple-600">Click To View Details</span>
+              <span className="pointer font-medium text-sm text-purple-600">Click To View Details</span>
             </div>
           </motion.button>
         );
@@ -158,8 +152,8 @@ function SubjectRadar({ tests }) {
     );
   }
 
-  const handleMode = (e, v) => {
-    if (v) setMode(v);
+  const handleMode = (e) => {
+    setMode(e.target.value);
   };
 
   let seriesToShow = [];
@@ -176,20 +170,14 @@ function SubjectRadar({ tests }) {
     <div className="bg-white p-3 rounded shadow">
       <div className="flex items-center justify-between mb-2">
         <div className="font-medium">Subject Comparison</div>
-        <ToggleButtonGroup
-          size="small"
+        <select
           value={mode}
-          exclusive
           onChange={handleMode}
-          aria-label="chart mode"
+          className="p-1 border rounded"
         >
-          <ToggleButton value="marks" aria-label="marks">
-            Marks
-          </ToggleButton>
-          <ToggleButton value="accuracy" aria-label="accuracy">
-            Accuracy
-          </ToggleButton>
-        </ToggleButtonGroup>
+          <option value="marks">Marks</option>
+          <option value="accuracy">Accuracy</option>
+        </select>
       </div>
       <div style={{ height: 320 }}>
         <RadarChart
@@ -336,9 +324,23 @@ function ComingSoon() {
 }
 
 export default function Performance() {
-  const tests = useMemo(() => genDummyTests(12), []);
+  const [timeScale, setTimeScale] = useState("weekly");
+  const tests = useMemo(() => genDummyTests(), []);
+
+  const handleTimeScaleChange = (event) => {
+    setTimeScale(event.target.value);
+  };
+
+  const data = performanceData[timeScale];
+  const {
+    cards: performanceCards,
+    subjectMetrics: performanceSubjectMetrics,
+    subjectData: performanceSubjectData,
+    trendChartData,
+  } = data;
+  const { labels, values } = trendChartData;
+
   const avg = 75;
-  const [range, setRange] = useState("30");
   const [activeTab, setActiveTab] = useState("practice");
   const navigate = useNavigate();
   const { subjectId } = useParams();
@@ -369,12 +371,6 @@ export default function Performance() {
       .filter(Boolean);
   }, [tests, subjectName]);
 
-  // Derived metrics for subject detail
-  const speed = 35; // time taken per question in seconds
-  const acc = 82;
-  const rank = 20;
-  const consistency = 85;
-
   // use centralized sample data from data/PerformanceData.js
   const cards = performanceCards;
   const subjectMetrics = performanceSubjectMetrics;
@@ -382,22 +378,6 @@ export default function Performance() {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold">Performance</h2>
-        <div className="flex items-center gap-3">
-          <select
-            value={range}
-            onChange={(e) => setRange(e.target.value)}
-            className="p-2 border rounded"
-          >
-            <option value="">Daily</option>
-            <option value="">Weekly</option>
-            <option value="">Monthly</option>
-            <option value="all">Overall</option>
-          </select>
-        </div>
-      </div>
-
       <div className="mb-6">
         <div className="flex justify-center">
           <div
@@ -432,6 +412,22 @@ export default function Performance() {
           </div>
         </div>
       </div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-semibold">Performance</h2>
+        <div className="flex items-center gap-3">
+          <select
+            value={timeScale}
+            onChange={handleTimeScaleChange}
+            className="p-2 border rounded"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="overall">Overall</option>
+          </select>
+        </div>
+      </div>
+
       {activeTab === "practice" ? (
         <div className="grid grid-cols-1 lg:grid-cols-9 gap-6">
           <AnimatePresence mode="wait">

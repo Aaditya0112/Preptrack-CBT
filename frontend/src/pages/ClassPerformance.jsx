@@ -25,6 +25,14 @@ const boxPlotData = [
     x: 'Test 5',
     y: [29, 31, 35, 39, 44],
   },
+  {
+    x: 'Test 6',
+    y: [29, 31, 35, 39, 44],
+  },
+  {
+    x: 'Test 7',
+    y: [29, 31, 35, 39, 44],
+  },
 ];
 
 const ClassBoxPlot = () => {
@@ -79,7 +87,7 @@ const ClassBoxPlot = () => {
       },
     ];
   
-    return <Chart options={options} series={series} type="boxPlot" height={350} />;
+    return <Chart options={options} series={series} type="boxPlot" height={350}  />;
 };
 
 export default function ClassPerformance() {
