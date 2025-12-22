@@ -12,7 +12,7 @@ function QuestionCard({ q, idx, checked, onToggle }) {
         </div>
         <div>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={checked} onChange={() => onToggle(q.id)} className="hidden peer" />
+            <input type="checkbox" checked={checked} onChange={() => onToggle(q.questionId)} className="hidden peer" />
             <div className="w-5 h-5 rounded border flex items-center justify-center peer-checked:bg-blue-600 peer-checked:border-blue-600 text-white">{checked ? '✓' : ''}</div>
           </label>
         </div>
@@ -22,11 +22,11 @@ function QuestionCard({ q, idx, checked, onToggle }) {
         {q.image && <img src={q.image} alt="q-img" className="mt-3 max-w-full rounded shadow-sm" />}
       </div>
       <div className="mt-4">
-        {q.type === 'MCQ' && (
+        {q.questionType === 'MCQ' && (
           <div className="grid grid-cols-1 gap-2">
             {q.options.map((opt) => (
-              <div key={opt.id} className="flex items-center gap-3 p-3 rounded-lg bg-white ">
-                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-semibold">{opt.id}</div>
+              <div key={opt.optionId} className="flex items-center gap-3 p-3 rounded-lg bg-white ">
+                <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-semibold">{opt.identifier}</div>
                 <div className="flex-1 text-sm text-gray-800"><QuestionRenderer text={opt.text} inline={true} /></div>
               </div>
             ))}
@@ -52,7 +52,7 @@ export default function Preview() {
   const exam = stateExam || examFromList;
 
   const questions = exam?.questions || [];
-  const [selected, setSelected] = useState(() => new Set(questions.map((q) => q.id)) );
+  const [selected, setSelected] = useState(() => new Set(questions.map((q) => q.questionId)) );
   const [timed, setTimed] = useState(true);
   const [timeMinutes, setTimeMinutes] = useState(() => exam?.durationInSeconds ? Math.round(exam.durationInSeconds / 60) : 180);
   const [rangeText, setRangeText] = useState('');
@@ -98,7 +98,7 @@ export default function Preview() {
       // empty input -> keep all selected (unless customized mode)
       // Only auto-select if there are visible questions
       if (selectionMode === 'all' && filteredQuestions.length > 0) {
-        setSelected(new Set(filteredQuestions.map((q) => q.id)));
+        setSelected(new Set(filteredQuestions.map((q) => q.questionId)));
       }
       return;
     }
@@ -111,11 +111,11 @@ export default function Preview() {
         if (Number.isFinite(a) && Number.isFinite(b)) {
           const from = Math.max(1, Math.min(a, b));
           const to = Math.min(filteredQuestions.length, Math.max(a, b));
-          for (let i = from; i <= to; i++) ids.add(filteredQuestions[i - 1].id);
+          for (let i = from; i <= to; i++) ids.add(filteredQuestions[i - 1].questionId);
         }
       } else if (/^\d+$/.test(p)) {
         const n = parseInt(p, 10);
-        if (n >= 1 && n <= filteredQuestions.length) ids.add(filteredQuestions[n - 1].id);
+        if (n >= 1 && n <= filteredQuestions.length) ids.add(filteredQuestions[n - 1].questionId);
       }
     }
     if (ids.size > 0) setSelected(ids);
@@ -124,11 +124,11 @@ export default function Preview() {
   // ensure selected set only contains ids from filteredQuestions when sections change
   React.useEffect(() => {
     setSelected(prev => {
-      const allowed = new Set(filteredQuestions.map(q => q.id));
+      const allowed = new Set(filteredQuestions.map(q => q.questionId));
       const next = new Set();
       for (const id of prev) if (allowed.has(id)) next.add(id);
       // if nothing remains selected, default to selecting all filtered questions only if there are visible questions
-      if (next.size === 0 && filteredQuestions.length > 0) filteredQuestions.forEach(q => next.add(q.id));
+      if (next.size === 0 && filteredQuestions.length > 0) filteredQuestions.forEach(q => next.add(q.questionId));
       return next;
     });
   }, [filteredQuestions]);
@@ -141,7 +141,7 @@ export default function Preview() {
     });
   };
 
-  const selectAll = () => setSelected(new Set(filteredQuestions.map((q) => q.id)));
+  const selectAll = () => setSelected(new Set(filteredQuestions.map((q) => q.questionId)));
   const clearAll = () => setSelected(new Set());
 
   const toggleSection = (sectionId) => {
@@ -158,7 +158,7 @@ export default function Preview() {
     if (isNaN(from) || isNaN(to) || from > to) return;
     setSelected((s) => {
       const n = new Set(s);
-      for (let i = from; i <= to; i++) n.add(questions[i - 1].id);
+      for (let i = from; i <= to; i++) n.add(questions[i - 1].questionId);
       return n;
     });
   };
@@ -169,7 +169,7 @@ export default function Preview() {
       alert('Please select at least one question');
       return;
     }
-  const selectedQs = questions.filter((q) => selected.has(q.id));
+  const selectedQs = questions.filter((q) => selected.has(q.questionId));
     // pass only the selected sections metadata as well
   const selectedSectionObjs = availableSections.filter(s => selectedSections.has(s.id));
   const examForRun = { ...exam, questions: selectedQs, sections: selectedSectionObjs, durationInSeconds: timed ? timeMinutes * 60 : 0 };
@@ -209,7 +209,7 @@ export default function Preview() {
             ) : (
               <div className="w-full">
                 {filteredQuestions.map((q, idx) => (
-                  <QuestionCard key={q.id} q={q} idx={idx} checked={selected.has(q.id)} onToggle={toggle} />
+                  <QuestionCard key={q.questionId} q={q} idx={idx} checked={selected.has(q.questionId)} onToggle={toggle} />
                 ))}
               </div>
             )}

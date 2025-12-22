@@ -31,10 +31,10 @@ export default function QuestionDisplay({ localAnswer, setLocalAnswer }) {
         )}
       </div>
 
-      {currentQuestion.type === 'MCQ' && (
+      {currentQuestion.questionType === 'MCQ' && (
         <MCQOptions options={currentQuestion.options} selected={localAnswer} onChange={setLocalAnswer} />
       )}
-      {currentQuestion.type === 'NUMERICAL' && (
+      {currentQuestion.questionType === 'NUM' && (
         <Numpad value={localAnswer || ''} onChange={setLocalAnswer} />
       )}
     </div>

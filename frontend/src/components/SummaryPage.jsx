@@ -8,12 +8,14 @@ export default function SummaryPage() {
 
   if (!state || !dispatch) return null;
 
+
   const summaryStats = useMemo(() => {
-    return state.sections.map(section => {
+    return state.sections.length > 0 ? 
+    state.sections.map(section => {
       const sectionQuestions = state.questions.filter(q => q.sectionId === section.id);
       const stats = { total: sectionQuestions.length, answered: 0, notAnswered: 0, marked: 0, answeredAndMarked: 0, notVisited: 0 };
       sectionQuestions.forEach(q => {
-        const status = state.answers[q.id].status;
+        const status = state.answers[q.questionId].status;
         switch (status) {
           case 'ANSWERED': stats.answered++; break;
           case 'NOT_ANSWERED': stats.notAnswered++; break;
@@ -23,7 +25,18 @@ export default function SummaryPage() {
         }
       });
       return { ...section, ...stats };
-    });
+    })
+    : state.questions.length > 0 ? [{
+        id: 'all',
+        name: 'All Questions',
+        total: state.questions.length,
+        answered: Object.values(state.answers).filter(a => a.status === 'ANSWERED').length,
+        notAnswered: Object.values(state.answers).filter(a => a.status === 'NOT_ANSWERED').length,
+        marked: Object.values(state.answers).filter(a => a.status === 'MARKED_FOR_REVIEW').length,
+        answeredAndMarked: Object.values(state.answers).filter(a => a.status === 'ANSWERED_AND_MARKED').length,
+        notVisited: Object.values(state.answers).filter(a => a.status === 'NOT_VISITED').length,
+      }] : [];
+
   }, [state.sections, state.questions, state.answers]);
 
   const handleFinalSubmit = () => dispatch({ type: 'FINAL_SUBMIT' });
@@ -48,7 +61,7 @@ export default function SummaryPage() {
               </tr>
             </thead>
             <tbody>
-              {summaryStats.map(sec => (
+              {state.sections && summaryStats.map(sec => (
                 <tr key={sec.id} className="text-center">
                   <td className="p-3 border text-left">{sec.name}</td>
                   <td className="p-3 border">{sec.total}</td>
@@ -59,6 +72,18 @@ export default function SummaryPage() {
                   <td className="p-3 border">{sec.notVisited}</td>
                 </tr>
               ))}
+              
+              {!state.sections && summaryStats.length > 0 &&  (
+                <tr key={summaryStats[0].id} className="text-center">
+                  <td className="p-3 border text-left">{summaryStats[0].name}</td>
+                  <td className="p-3 border">{summaryStats[0].total}</td>
+                  <td className="p-3 border">{summaryStats[0].answered}</td>
+                  <td className="p-3 border">{summaryStats[0].notAnswered}</td>
+                  <td className="p-3 border">{summaryStats[0].marked}</td>
+                  <td className="p-3 border">{summaryStats[0].answeredAndMarked}</td>
+                  <td className="p-3 border">{summaryStats[0].notVisited}</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

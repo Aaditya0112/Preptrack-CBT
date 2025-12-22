@@ -18,11 +18,11 @@ export default function LeftSection() {
   useEffect(() => {
     // Only update localAnswer when currentQuestion is available
     if (!currentQuestion || !answers) return;
-    const newAnswerState = answers[currentQuestion.id];
+    const newAnswerState = answers[currentQuestion.questionId];
     if (newAnswerState) {
-      setLocalAnswer(newAnswerState.answer || (currentQuestion.type === 'NUMERICAL' ? '' : null));
+      setLocalAnswer(newAnswerState.answer || (currentQuestion.questionType === 'NUM' ? '' : null));
     } else {
-      setLocalAnswer(currentQuestion.type === 'NUMERICAL' ? '' : null);
+      setLocalAnswer(currentQuestion.questionType === 'NUM' ? '' : null);
     }
   }, [currentQuestionIndex, answers, questions, currentQuestion]);
 

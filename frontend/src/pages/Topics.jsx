@@ -1,27 +1,38 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { COACHINGMATERIALS } from '../data/coachingMaterial'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
+import { getTopics } from '../api/index'
 
 export default function Topics() {
   const { subjectId } = useParams()
   const navigate = useNavigate()
-  const material = COACHINGMATERIALS.find(m => m.id === subjectId)
-  if (!material) return (
-    <div className="p-6">
-      <div className="text-lg">Subject not found</div>
-    </div>
-  )
+  // const material = COACHINGMATERIALS.find(m => m.id === subjectId)
+  // if (!material) return (
+  //   <div className="p-6">
+  //     <div className="text-lg">Subject not found</div>
+  //   </div>
+  // )
 
-  const getProgress = (topicId) => {
-    // deterministic pseudo-random progress based on topicId
-    let h = 0
-    for (let i = 0; i < topicId.length; i++) h = (h << 5) - h + topicId.charCodeAt(i)
-    const pct = Math.abs(h) % 70 + 15 // 15..84
-    return pct
-  }
+  const [topics, setTopics] = useState([])
+
+  useEffect(() => { 
+    const fetchTopics = async () => { 
+      try {
+        const response = await getTopics()
+
+        const filteredTopics = response.data.filter(topic => topic.subject.id === parseInt(subjectId));
+        setTopics(filteredTopics);
+      } catch (error) {
+        console.error("There was an error fetching the topics!", error);
+      }
+    }
+
+    fetchTopics();
+  }, [subjectId])
 
   function CircularProgressWithLabel({ value }) {
     return (
@@ -51,8 +62,8 @@ export default function Topics() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-semibold">{material.title} Topics</h2>
-          <div className="text-sm text-gray-500">{material.subtitle}</div>
+          <h2 className="text-2xl font-semibold">{topics[0]?.subject.subject} </h2>
+          <div className="text-sm text-gray-500">{topics.length} Topics</div>
         </div>
         <div>
           <button onClick={() => navigate(-1)} className="px-3 py-1 border rounded">Back</button>
@@ -60,7 +71,7 @@ export default function Topics() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {material.topics.map(topic => (
+        {topics.map(topic => (
           <article key={topic.topicId} className="bg-white p-3 rounded shadow hover:shadow-md">
             <div className="flex items-start justify-between">
               <div>
@@ -68,7 +79,7 @@ export default function Topics() {
                 <div className="text-xs text-gray-500 mt-1">{topic.difficulty} • {topic.estMinutes} mins</div>
               </div>
               <div >
-                <CircularProgressWithLabel value={getProgress(topic.topicId)} />
+                <CircularProgressWithLabel value={topic.progressPercent} />
               </div>
             </div>
             <div className="mt-2 text-sm text-gray-700">{topic.summary}</div>
@@ -78,9 +89,10 @@ export default function Topics() {
                 onClick={() => {
                   const examObj = {
                     examId: `${topic.topicId}_exam`,
-                    examTitle: `${material.title} - ${topic.title}`,
-                    durationInSeconds: (topic.estMinutes || 30) * 60,
-                    questions: topic.questions || []
+                    examTitle: `${topic.subject.subject} - ${topic.title}`,
+                    durationInSeconds: (topic.estMinutes || 30) * 60,  // TODO: adjust as needed
+                    questions: topic.questions || [],
+                    assessmentType: 'practice',
                   }
                   navigate(`/preview`, { state: { exam: examObj } })
                 }}

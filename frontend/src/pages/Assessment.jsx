@@ -65,6 +65,7 @@ export default function AssessmentPage({ user, exam, onExit }) {
           timeLeft: state.timeLeft,
           elapsedSeconds: (state.elapsedSeconds || 0) + ((state.initialDuration || 0) === 0 ? delta : 0),
           initialDuration: state.initialDuration || 0,
+          assessmentType: state.assessmentType || 'exam',
         };
 
         try {
@@ -97,7 +98,7 @@ export default function AssessmentPage({ user, exam, onExit }) {
   // initialize exam into reducer when selectedExam becomes available
   useEffect(() => {
     if (selectedExam) {
-      dispatch({ type: 'INITIALIZE_EXAM', payload: { questions: selectedExam.questions, sections: selectedExam.sections, durationInSeconds: selectedExam.durationInSeconds, examTitle: selectedExam.examTitle } });
+      dispatch({ type: 'INITIALIZE_EXAM', payload: { questions: selectedExam.questions, sections: selectedExam.sections, durationInSeconds: selectedExam.durationInSeconds, examTitle: selectedExam.examTitle, assessmentType : selectedExam.assessmentType } });
       lastActiveRef.current = Date.now();
     }
   }, [selectedExam]);

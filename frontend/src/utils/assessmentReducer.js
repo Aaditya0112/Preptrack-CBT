@@ -24,14 +24,14 @@ const initialState = {
 export default function assessmentReducer(state = initialState, action) {
   switch (action.type) {
     case 'INITIALIZE_EXAM': {
-      const { questions, sections, durationInSeconds, examTitle } = action.payload;
+      const { questions, sections, durationInSeconds, examTitle, assessmentType} = action.payload;
       const initialAnswers = {};
-      questions.forEach(q => { initialAnswers[q.id] = { answer: null, status: QUESTION_STATUS.NOT_VISITED }; });
-      if (questions.length > 0) initialAnswers[questions[0].id].status = QUESTION_STATUS.NOT_ANSWERED;
+      questions.forEach(q => { initialAnswers[q.questionId] = { answer: null, status: QUESTION_STATUS.NOT_VISITED }; });
+      if (questions.length > 0) initialAnswers[questions[0].questionId].status = QUESTION_STATUS.NOT_ANSWERED;
       // initialize timeSpent map
       const timeSpent = {};
-      questions.forEach(q => { timeSpent[q.id] = 0; });
-      return { ...initialState, questions, sections, answers: initialAnswers, timeLeft: durationInSeconds, initialDuration: durationInSeconds, examTitle, currentSectionId: sections[0]?.id || null, currentQuestionIndex: 0, timeSpent, elapsedSeconds: 0 };
+      questions.forEach(q => { timeSpent[q.questionId] = 0; });
+      return { ...initialState, questions, sections, answers: initialAnswers, timeLeft: durationInSeconds, initialDuration: durationInSeconds, examTitle, currentSectionId: sections[0]?.id || null, currentQuestionIndex: 0, timeSpent, elapsedSeconds: 0, assessmentType };
     }
     case 'ADD_TIME': {
       // payload: { questionId, delta } where delta is seconds to add
@@ -44,8 +44,8 @@ export default function assessmentReducer(state = initialState, action) {
     case 'GO_TO_QUESTION': {
       const newIndex = action.payload;
       if (newIndex < 0 || newIndex >= state.questions.length) return state;
-      const currentQuestionId = state.questions[state.currentQuestionIndex].id;
-      const newQuestionId = state.questions[newIndex].id;
+      const currentQuestionId = state.questions[state.currentQuestionIndex].questionId;
+      const newQuestionId = state.questions[newIndex].questionId;
       const newAnswers = { ...state.answers };
       if (newAnswers[currentQuestionId].status === QUESTION_STATUS.NOT_VISITED) newAnswers[currentQuestionId].status = QUESTION_STATUS.NOT_ANSWERED;
       if (newAnswers[newQuestionId].status === QUESTION_STATUS.NOT_VISITED) newAnswers[newQuestionId].status = QUESTION_STATUS.NOT_ANSWERED;
@@ -53,41 +53,41 @@ export default function assessmentReducer(state = initialState, action) {
     }
     case 'SAVE_AND_NEXT': {
       const { answer } = action.payload;
-      const currentQuestionId = state.questions[state.currentQuestionIndex].id;
+      const currentQuestionId = state.questions[state.currentQuestionIndex].questionId;
       const newAnswers = { ...state.answers };
       const hasAnswer = answer !== null && answer !== undefined && answer !== '';
       newAnswers[currentQuestionId] = { answer: answer, status: hasAnswer ? QUESTION_STATUS.ANSWERED : QUESTION_STATUS.NOT_ANSWERED };
       const nextIndex = Math.min(state.currentQuestionIndex + 1, state.questions.length - 1);
       if (nextIndex !== state.currentQuestionIndex) {
-        const nextQuestionId = state.questions[nextIndex].id;
+        const nextQuestionId = state.questions[nextIndex].questionId;
         if (newAnswers[nextQuestionId].status === QUESTION_STATUS.NOT_VISITED) newAnswers[nextQuestionId].status = QUESTION_STATUS.NOT_ANSWERED;
       }
       return { ...state, answers: newAnswers, currentQuestionIndex: nextIndex, currentSectionId: state.questions[nextIndex].sectionId };
     }
     case 'GO_TO_PREVIOUS': {
-      const currentQuestionId = state.questions[state.currentQuestionIndex].id;
+      const currentQuestionId = state.questions[state.currentQuestionIndex].questionId;
       const newAnswers = { ...state.answers };
       const prevIndex = Math.max(state.currentQuestionIndex - 1, 0);
       if (newAnswers[currentQuestionId].status === QUESTION_STATUS.NOT_VISITED) newAnswers[currentQuestionId].status = QUESTION_STATUS.NOT_ANSWERED;
-      const prevQuestionId = state.questions[prevIndex].id;
+      const prevQuestionId = state.questions[prevIndex].questionId;
       if (newAnswers[prevQuestionId].status === QUESTION_STATUS.NOT_VISITED) newAnswers[prevQuestionId].status = QUESTION_STATUS.NOT_ANSWERED;
       return { ...state, currentQuestionIndex: prevIndex, currentSectionId: state.questions[prevIndex].sectionId, answers: newAnswers };
     }
     case 'MARK_AND_NEXT': {
       const { answer } = action.payload;
-      const currentQuestionId = state.questions[state.currentQuestionIndex].id;
+      const currentQuestionId = state.questions[state.currentQuestionIndex].questionId;
       const newAnswers = { ...state.answers };
       const hasAnswer = answer !== null && answer !== undefined && answer !== '';
       newAnswers[currentQuestionId] = { answer: answer, status: hasAnswer ? QUESTION_STATUS.ANSWERED_AND_MARKED : QUESTION_STATUS.MARKED_FOR_REVIEW };
       const nextIndex = Math.min(state.currentQuestionIndex + 1, state.questions.length - 1);
       if (nextIndex !== state.currentQuestionIndex) {
-        const nextQuestionId = state.questions[nextIndex].id;
+        const nextQuestionId = state.questions[nextIndex].questionId;
         if (newAnswers[nextQuestionId].status === QUESTION_STATUS.NOT_VISITED) newAnswers[nextQuestionId].status = QUESTION_STATUS.NOT_ANSWERED;
       }
       return { ...state, answers: newAnswers, currentQuestionIndex: nextIndex, currentSectionId: state.questions[nextIndex].sectionId };
     }
     case 'CLEAR_RESPONSE': {
-      const currentQuestionId = state.questions[state.currentQuestionIndex].id;
+      const currentQuestionId = state.questions[state.currentQuestionIndex].questionId;
       const newAnswers = { ...state.answers };
       newAnswers[currentQuestionId] = { answer: null, status: QUESTION_STATUS.NOT_ANSWERED };
       return { ...state, answers: newAnswers };

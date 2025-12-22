@@ -3,7 +3,8 @@ import MathField from './MathField';
 
 export default function QuestionRenderer({ text, inline = false }) {
   if (!text) return null;
-  const parts = text.split(/(\$\$[^$]+\$\$|\$[^\n$]+\$)/g).filter(Boolean);
+  const cleanedText = text.replace(/\\\\/g, '\\');
+  const parts = cleanedText.split(/(\$\$[^$]+\$\$|\$[^\n$]+\$)/g).filter(Boolean);
   const OuterTag = inline ? 'span' : 'div';
   return (
     <OuterTag className={inline ? 'inline' : 'text-gray-800 text-sm leading-relaxed'}>
