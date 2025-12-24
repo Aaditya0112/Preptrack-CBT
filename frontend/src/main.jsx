@@ -76,5 +76,5 @@ createRoot(document.getElementById('root')).render(
     <MathLiveProvider>
       <RouterProvider router={router} />
     </MathLiveProvider>
-  </StrictMode>,
+  </StrictMode>
 )
