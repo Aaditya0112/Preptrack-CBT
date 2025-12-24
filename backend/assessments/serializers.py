@@ -5,7 +5,7 @@ class CorrectAnswerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CorrectAnswer
-        fields = ['question', 'mcq_correct_option', 'numerical_answer', 'numerical_answer_range_min', 'numerical_answer_range_max']
+        fields = [ 'question','mcq_correct_option', 'numerical_answer', 'numerical_answer_range_min', 'numerical_answer_range_max']
 
 class PracticeSerializer(serializers.ModelSerializer):
     # topics = TopicSerializer(many=True, read_only=True)
@@ -28,7 +28,12 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ['questionId', 'questionText', 'questionType', 'difficulty', 'refImage', 'section','topic', 'options', 'exam', 'practice', 'correct_answer']
+        fields = ['questionId', 'questionText', 'questionType', 'difficulty', 'refImage', 'section','topic', 'category', 'options', 'exam', 'practice', 'correct_answer']
+
+class QuestionMinimalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['questionId', 'questionText', 'questionType', 'difficulty', 'correct_answer']   
 
 
 class TopicSerializer(serializers.ModelSerializer):

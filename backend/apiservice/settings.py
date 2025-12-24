@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",
     "corsheaders",
 
-    "assessments"
+    "assessments",
+    "performance",
+
 ]
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -86,6 +88,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'apiservice.wsgi.application'
+
+# AUTH_USER_MODEL = "users.User"
 
 
 # Database

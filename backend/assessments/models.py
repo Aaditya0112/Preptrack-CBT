@@ -29,12 +29,12 @@ class Section(models.Model):
 class Practice(models.Model):
 
     PRACTICE_SUBJECTS = [
-        ('PHY', 'Physics'),
-        ('CHM', 'Chemistry'), 
-        ('MTH', 'Mathematics'),
+        ('Physics', 'Physics'),
+        ('Chemistry', 'Chemistry'), 
+        ('Mathematics', 'Mathematics'),
     ]
     
-    subject = models.CharField(max_length=3, choices=PRACTICE_SUBJECTS)
+    subject = models.CharField(max_length=11, choices=PRACTICE_SUBJECTS)
     subjImage = models.ImageField(upload_to='practice_subject_images/', blank=True, null=True)
     durationInMin = models.IntegerField()
     
@@ -71,11 +71,11 @@ class Question(models.Model):
     ]
 
     DIFFICULTY_LEVELS = [
-        ('E', 'Easy'),
-        ('M', 'Medium'),
-        ('H', 'Hard'),
+        ('Easy', 'Easy'),
+        ('Medium', 'Medium'),
+        ('Hard', 'Hard'),
     ]
-
+    # since all topics will folow same hierarchy of questions
     category = [
         ('Level 1', 'Level 1'),
         ('Level 2', 'Level 2'),
@@ -84,17 +84,18 @@ class Question(models.Model):
     questionId = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     questionText = models.TextField()
     questionType = models.CharField(max_length=3, choices=QUESTION_TYPES)
-    difficulty = models.CharField(max_length=1, choices=DIFFICULTY_LEVELS)
+    difficulty = models.CharField(max_length=6, choices=DIFFICULTY_LEVELS)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE, related_name='questions', blank=True, null=True )
     refImage = models.ImageField(upload_to='question_images/', blank=True, null=True)
     section = models.ForeignKey(Section, on_delete=models.CASCADE, related_name='questions', blank=True, null=True)
     #  this will create the distinction of questions for exam and practice
     exam = models.ForeignKey(Exam, on_delete=models.CASCADE, related_name='questions', blank=True, null=True)
     practice = models.ForeignKey(Practice, on_delete=models.CASCADE, related_name='questions', blank=True, null=True)
-    # category = models.CharField(max_length=100, blank=True, null=True, choices=category)  
+    category = models.CharField(max_length=100, blank=True, null=True, choices=category)  
+    marks = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
-        return f" {self.questionText[:50]}..."
+        return f" {self.questionText[:100]}..."
 
 class Option(models.Model):
     MCQ_CHOICES = [
