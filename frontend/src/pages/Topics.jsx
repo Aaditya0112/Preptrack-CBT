@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { COACHINGMATERIALS } from '../data/coachingMaterial'
+// import { COACHINGMATERIALS } from '../data/coachingMaterial'
 import CircularProgress from '@mui/material/CircularProgress'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
-import { getTopics } from '../api/index'
+import { getTopics } from '../api/index.js'
 
 export default function Topics() {
   const { subjectId } = useParams()
@@ -88,11 +88,13 @@ export default function Topics() {
                 className="px-2 py-1 bg-blue-500 text-white border rounded text-sm"
                 onClick={() => {
                   const examObj = {
-                    examId: `${topic.topicId}_exam`,
+                    examId: `${topic.topicId}`,
                     examTitle: `${topic.subject.subject} - ${topic.title}`,
                     durationInSeconds: (topic.estMinutes || 30) * 60,  // TODO: adjust as needed
                     questions: topic.questions || [],
                     assessmentType: 'practice',
+                    practiceId : topic.subject.id,
+                    categories : [{id: "Level 1", name: 'Level 1'}, {id: "Level 2", name: 'Level 2'}],
                   }
                   navigate(`/preview`, { state: { exam: examObj } })
                 }}

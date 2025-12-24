@@ -1,4 +1,4 @@
-import { EXAM_DATA } from './examData'
+import { EXAM_DATA } from './examData.js'
 
 // topics array structure for each subject — these will be rendered as cards
 const PHYSICS_TOPICS = [

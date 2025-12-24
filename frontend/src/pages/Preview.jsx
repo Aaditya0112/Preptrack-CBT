@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import EXAMS from '../data/examsList';
-import QuestionRenderer from '../components/QuestionRenderer';
+import EXAMS from '../data/examsList.js';
+import QuestionRenderer from '../components/QuestionRenderer.jsx';
+import { createAttempt } from '../api/index.js';
 
 function QuestionCard({ q, idx, checked, onToggle }) {
   return (
@@ -163,7 +164,7 @@ export default function Preview() {
     });
   };
 
-  const handleProceed = () => {
+  const handleProceed = async () => {
     if (!exam) return;
     if (!selected || selected.size === 0) {
       alert('Please select at least one question');
@@ -173,9 +174,45 @@ export default function Preview() {
     // pass only the selected sections metadata as well
   const selectedSectionObjs = availableSections.filter(s => selectedSections.has(s.id));
   const examForRun = { ...exam, questions: selectedQs, sections: selectedSectionObjs, durationInSeconds: timed ? timeMinutes * 60 : 0 };
-    // navigate to assessment with exam object in state
-    navigate('/assessment', { state: { exam: examForRun } });
+  console.log(examForRun);
+
+    const initialAttemptData = {
+    "username": "demo_user",
+    "end_time": null,
+    "score": null,
+    // "practice": null,
   };
+
+  if(examForRun.assessmentType === "practice"){
+    initialAttemptData.practice = examForRun.practiceId;
+    initialAttemptData.topic = examForRun.examId;
+  }else{
+    initialAttemptData.exam = examForRun.examId;
+  }
+  console.log("Initial Attempt Data: ", initialAttemptData);
+
+  
+  
+      const createUserAttempt = async () => {
+        try {
+          const response = await createAttempt(initialAttemptData);
+          console.log("Attempt creation response: ", );
+// TODO Add attemptId to final submission payload
+          if(response.data){
+            navigate(`/assessment`, { state: { exam: examForRun, attemptId: response.data.attemptId } });
+          }else{
+            console.error("Failed to create attempt. No response from server.");
+          }
+        } catch (error) {
+          console.error("There was an error fetching the practice sessions!", error);
+        }
+      };
+      createUserAttempt();
+  
+    }
+
+    
+  
 
   if (!exam) {
     return (
@@ -299,7 +336,7 @@ export default function Preview() {
             )}
 
             <div className="mt-6">
-              <button onClick={handleProceed} className={`w-full py-2 text-white rounded shadow ${filteredQuestions.length === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600'}`} disabled={filteredQuestions.length === 0}>Proceed to Assessment</button>
+              <button onClick={async() => await handleProceed()} className={`w-full py-2 text-white rounded shadow ${filteredQuestions.length === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600'}`} disabled={filteredQuestions.length === 0}>Proceed to Assessment</button>
               <button onClick={() => navigate('/dashboard')} className="w-full mt-3 py-2 bg-white text-gray-700 rounded border">Back to Dashboard</button>
             </div>
 

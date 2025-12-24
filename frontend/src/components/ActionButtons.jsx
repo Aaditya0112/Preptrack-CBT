@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { AssessmentContext } from '../context/assessmentContext';
+import { AssessmentContext } from '../context/assessmentContext.jsx';
 
 export default function ActionButtons({ localAnswer, setLocalAnswer, currentQuestion }) {
   const ctx = useContext(AssessmentContext);

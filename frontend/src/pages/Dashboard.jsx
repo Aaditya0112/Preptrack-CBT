@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import EXAMS from '../data/examsList';
+import EXAMS from '../data/examsList.js';
 import { useNavigate } from 'react-router-dom';
-import { getPractices } from '../api/index';
+import { getPractices } from '../api/index.js';
 
 export default function Dashboard() {
   const navigate = useNavigate();

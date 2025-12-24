@@ -1,9 +1,9 @@
 import React, {useState} from "react"
 import {Link, useNavigate} from "react-router-dom"
 // import { useDispatch } from "react-redux";
-import Button from "../components/Button";
-import Logo from "../components/Logo";
-import Input from "../components/Input";
+import Button from "../components/Button.jsx";
+import Logo from "../components/Logo.jsx";
+import Input from "../components/Input.jsx";
 import { useForm } from "react-hook-form";
 
 

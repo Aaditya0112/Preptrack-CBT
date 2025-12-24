@@ -2,7 +2,7 @@ import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { LineChart } from '@mui/x-charts/LineChart';
-import InfoCard from '../components/performance/InfoCard';
+import InfoCard from '../components/performance/InfoCard.jsx';
 import { Info } from 'lucide-react';
 
 

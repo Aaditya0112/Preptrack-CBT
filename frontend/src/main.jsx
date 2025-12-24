@@ -64,7 +64,8 @@ const router = createBrowserRouter([
       },
       {
         path : "/assessment",
-        element : <App/>
+        element : <App />,
+        
       }
     ]
   },

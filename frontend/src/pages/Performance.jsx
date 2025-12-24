@@ -4,17 +4,17 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { LineChart, PieChart, BarChart, RadarChart } from "@mui/x-charts";
 
-import TrendChart from "../components/performance/TrendChart";
-import SubjectAnalysis from "../components/performance/SubjectAnalysis";
-import SnapshotCards from "../components/performance/SnapshotCards";
-import TopicWeakness from "../components/performance/TopicWeakness";
+import TrendChart from "../components/performance/TrendChart.jsx";
+import SubjectAnalysis from "../components/performance/SubjectAnalysis.jsx";
+import SnapshotCards from "../components/performance/SnapshotCards.jsx";
+import TopicWeakness from "../components/performance/TopicWeakness.jsx";
 import {
   performanceData,
   genDummyTests,
-} from "../data/PerformanceData";
+} from "../data/PerformanceData.js";
 
-import InfoCard from "../components/performance/InfoCard";
-import LevelBadge from "../components/performance/LevelBadge";
+// import InfoCard from "../components/performance/InfoCard";
+import LevelBadge from "../components/performance/LevelBadge.jsx";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
 import {
   areaElementClasses,

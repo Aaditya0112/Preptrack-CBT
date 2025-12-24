@@ -1,4 +1,4 @@
-import { EXAM_DATA } from './examData';
+import { EXAM_DATA } from './examData.js';
 
 // Simple exams list for Dashboard. For now we clone the single EXAM_DATA with different titles/images.
 export const EXAMS = [

@@ -40,7 +40,7 @@ export default function LeftSection() {
         <div className="flex justify-end mb-4">
           <Timer />
         </div>
-        <SectionTabs />
+        {state.sections.length > 0 && <SectionTabs />}
       </div>
       <div className='flex justify-end items-center p-1 text-sm bg-blue-400'>
         <div className="flex items-center space-x-2">

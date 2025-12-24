@@ -1,6 +1,6 @@
 import React from 'react';
-import AssessmentPage from './pages/Assessment';
-import { USER_DATA } from './data/examData';
+import AssessmentPage from './pages/Assessment.jsx';
+import { USER_DATA } from './data/examData.js';
 
 
 export default function App() {

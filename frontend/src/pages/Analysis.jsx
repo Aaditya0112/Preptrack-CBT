@@ -1,9 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react'
-import { EXAM_DATA } from '../data/examData'
-import { EXAM_ATTEMPTS, USER_ANSWERS } from '../data/attemptsData'
+import { EXAM_DATA } from '../data/examData.js'
+import { EXAM_ATTEMPTS, USER_ANSWERS } from '../data/attemptsData.js'
 import { BarChart, PieChart } from '@mui/x-charts'
-import MathField from '../components/MathField'
-import QuestionRenderer from '../components/QuestionRenderer'
+import MathField from '../components/MathField.jsx'
+import QuestionRenderer from '../components/QuestionRenderer.jsx'
 
 
 const COLORS = {

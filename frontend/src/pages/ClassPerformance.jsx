@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Chart from 'react-apexcharts';
-import SnapshotCards from '../components/performance/SnapshotCards';
+import SnapshotCards from '../components/performance/SnapshotCards.jsx';
 
 // Mock data for box plot
 const boxPlotData = [

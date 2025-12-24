@@ -14,6 +14,7 @@ const initialState = {
   currentSectionId: null,
   timeLeft: 0,
   showSummary: false,
+  examId: null,
   examTitle: "",
   showValidationError: false,
   timeSpent: {}, // per-question seconds
@@ -24,17 +25,17 @@ const initialState = {
 export default function assessmentReducer(state = initialState, action) {
   switch (action.type) {
     case 'INITIALIZE_EXAM': {
-      const { questions, sections, durationInSeconds, examTitle, assessmentType} = action.payload;
+      const { examId, questions, sections, durationInSeconds, examTitle, assessmentType, practiceId,  categories} = action.payload;
       const initialAnswers = {};
       questions.forEach(q => { initialAnswers[q.questionId] = { answer: null, status: QUESTION_STATUS.NOT_VISITED }; });
       if (questions.length > 0) initialAnswers[questions[0].questionId].status = QUESTION_STATUS.NOT_ANSWERED;
       // initialize timeSpent map
       const timeSpent = {};
       questions.forEach(q => { timeSpent[q.questionId] = 0; });
-      return { ...initialState, questions, sections, answers: initialAnswers, timeLeft: durationInSeconds, initialDuration: durationInSeconds, examTitle, currentSectionId: sections[0]?.id || null, currentQuestionIndex: 0, timeSpent, elapsedSeconds: 0, assessmentType };
+      return { ...initialState, questions, sections, answers: initialAnswers, timeLeft: durationInSeconds, initialDuration: durationInSeconds, examTitle, examId, currentSectionId: sections[0]?.id || null, currentQuestionIndex: 0, timeSpent, elapsedSeconds: 0, assessmentType, practiceId, categories };
     }
     case 'ADD_TIME': {
-      // payload: { questionId, delta } where delta is seconds to add
+      // payload: { questionId, delta } // where delta is seconds to add
       const { questionId, delta } = action.payload || {};
       if (!questionId || !delta) return state;
       const timeSpent = { ...(state.timeSpent || {}) };
@@ -101,7 +102,7 @@ export default function assessmentReducer(state = initialState, action) {
       return { ...state, timeLeft: state.timeLeft - 1 };
     }
     case 'TOGGLE_SUMMARY': return { ...state, showSummary: !state.showSummary };
-    case 'FINAL_SUBMIT': console.log('Exam Submitted!', state.answers); return { ...state, timeLeft: 0 };
+    case 'FINAL_SUBMIT':  return { ...state, timeLeft: 0 };
     case 'SHOW_VALIDATION_ERROR': return { ...state, showValidationError: true };
     case 'HIDE_VALIDATION_ERROR': return { ...state, showValidationError: false };
     default: return state;
