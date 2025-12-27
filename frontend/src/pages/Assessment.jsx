@@ -59,6 +59,7 @@ export default function AssessmentPage({ user, exam, onExit }) {
     }
 
     if (action.type === 'FINAL_SUBMIT') {
+      let resJson = null;
       try {
         const timeSpentUpdated = { ...(state.timeSpent || {}) };
         const currentQId = state.questions?.[state.currentQuestionIndex]?.questionId ?? state.questions?.[state.currentQuestionIndex]?.id;
@@ -100,31 +101,33 @@ export default function AssessmentPage({ user, exam, onExit }) {
         try {
           // send to backend and capture response body for debugging
           console.log('Submitting payload to server:', payload);
-          const res = await fetch('http://127.0.0.1:8000/api/performance/submit/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-          });
-          const resJson = await res.json().catch(() => null);
-          if (!res.ok) {
-            console.error('Submission failed', res.status);
-            console.error('Server response (stringified):', JSON.stringify(resJson, null, 2));
-          } else {
+          const res = await submitAnswers(JSON.stringify(payload));
+          console.log('Server response:', res);
+          // const res = await fetch('http://127.0.0.1:8000/api/performance/submit/', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify(payload),
+          // });
+          resJson = res.data;
+          if (res.status === 201) {
             console.log('Submission success', res.status, resJson);
+            dispatch(action);
+             try {
+              navigate('/analysis', { state: { submissionResult: resJson } });
+            } catch (e) {
+              console.warn('Navigation to analysis failed', e);
+            }
+
+            // console.error('Server response (stringified):', JSON.stringify(resJson, null, 2));
+          } else {
+            console.error('Submission failed', res.status, res);
+           
           }
         } catch (e) {
           console.warn('Submission endpoint unavailable, payload logged to console', e);
         }
       } catch (err) {
         console.error('Error during submit:', err);
-      } finally {
-        dispatch(action);
-        // navigate to analysis page after final submit
-        try {
-          navigate('/analysis');
-        } catch (e) {
-          console.warn('Navigation to analysis failed', e);
-        }
       }
     } else {
       dispatch(action);

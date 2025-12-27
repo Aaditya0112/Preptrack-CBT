@@ -81,7 +81,7 @@ export const createAttempt = (attemptData) => {
 }
 
 export const submitAnswers = (answersData) => {
-  return apiClient.post('/performance/attempts/submit/', answersData);
+  return apiClient.post('/performance/submit/', answersData);
 }
 
 export default apiClient;

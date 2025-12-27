@@ -43,7 +43,7 @@ class ExamAttempt(models.Model):
     @property
     def totalTimeTaken(self):
         if self.end_time and self.start_time:
-            return (self.end_time - self.start_time).total_seconds() / 60  # in minutes
+            return (self.end_time - self.start_time).total_seconds() # in seconds
         return None
 
 class UserAnswer(models.Model):
@@ -103,9 +103,12 @@ class Stats(models.Model):
 
     exam_attempt = models.ForeignKey(ExamAttempt, on_delete=models.CASCADE, related_name='stats')
     username = models.CharField(max_length=150, default='demo_user')
+    total_questions = models.IntegerField(default=0)
     questions_attempted = models.IntegerField(default=0)
     correct_answers = models.IntegerField(default=0)
-    not_attempted = models.IntegerField(default=0)
+    marks = models.DecimalField(max_digits=7, decimal_places=2, default=0.0)
+
+    not_attempted = models.IntegerField(default=0) # iski zaroorat nhi hai
     attempt_rate = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)  # percentage
     accuracy = models.DecimalField(max_digits=5, decimal_places=2, default=0.0)
     difficulty_wise_stats = models.JSONField(default=dict)  
