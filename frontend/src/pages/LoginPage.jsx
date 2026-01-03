@@ -1,23 +1,36 @@
 import React, {useState} from "react"
 import {Link, useNavigate} from "react-router-dom"
-// import { useDispatch } from "react-redux";
 import Button from "../components/Button.jsx";
 import Logo from "../components/Logo.jsx";
 import Input from "../components/Input.jsx";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../context/AuthContext.jsx";
 
 
 function Login() {
     const navigate = useNavigate()
-    // const dispatch = useDispatch()
+    const { loginUser } = useAuth()
 
-    const {register, handleSubmit} = useForm()
+    const {register, handleSubmit, formState: { errors }} = useForm()
     const [error, setError] = useState("")
+    const [submitting, setSubmitting] = useState(false)
     const [role, setRole] = useState("student") // 'student' or 'teacher'
 
-    const login = async () =>{
+    const onSubmit = async (formValues) =>{
         setError("")
-        navigate("/assessment")
+        setSubmitting(true)
+        try {
+            await loginUser({
+                mobile: formValues.mobile,
+                password: formValues.password,
+            })
+            navigate("/dashboard")
+        } catch (err) {
+            const message = err?.response?.data?.detail || "Unable to login"
+            setError(message)
+        } finally {
+            setSubmitting(false)
+        }
     }
 
   return (
@@ -79,17 +92,14 @@ function Login() {
 
                     {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
-                    <form onSubmit={handleSubmit(login)} className="mt-8">
+                    <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
                         <div className="space-y-5">
                             <Input
-                                label="Email :"
-                                placeholder="Enter your email"
-                                type="email"
-                                {...register("email", {
-                                    required: true, 
-                                    validate:{
-                                        matchPattern: (value) => /\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b/.test(value) || "Email Address must be valid"
-                                    }
+                                label="Mobile :"
+                                placeholder="Enter your mobile number"
+                                type="tel"
+                                {...register("mobile", {
+                                    required: "Mobile is required",
                                 })}  
                             />
 
@@ -98,15 +108,16 @@ function Login() {
                                 placeholder="Enter your password"
                                 type="password"
                                 {...register("password", {
-                                    required: true
+                                    required: "Password is required"
                                 })}
                             />
 
                             <Button
                                 type="submit"
                                 className="w-full"
+                                disabled={submitting}
                             >
-                                Sign in
+                                {submitting ? 'Signing in...' : 'Sign in'}
                             </Button>
                         </div>
                     </form>

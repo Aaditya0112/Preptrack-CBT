@@ -1,24 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import EXAMS from '../data/examsList.js';
 import { useNavigate } from 'react-router-dom';
 import { getPractices } from '../api/index.js';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [practices, setPractices] = useState([]);
 
-  useEffect(() => {
-    const fetchPractices = async () => {
-      try {
-        const response = await getPractices();
-        setPractices(response.data);
-      } catch (error) {
-        console.error("There was an error fetching the practice sessions!", error);
-      }
-    };
-
-    fetchPractices();
-  }, []);
+  const { data: practices = [], isLoading, isError } = useQuery({
+    queryKey: ['practices'],
+    queryFn: async () => {
+      const res = await getPractices();
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   const handleSelect = (examId) => {
     // navigate to /preview and pass examId in location state
@@ -55,23 +51,27 @@ export default function Dashboard() {
       <hr className='p-2 m-4 border-t-gray-300'/>
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Available Coaching Materials</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {practices.map((practice) => (
-            <article key={practice.id} className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow" onClick={() => openSubject(practice.id)}>
-              <div className="h-44 bg-gray-200">
-                <img src={practice.subjImage} alt={practice.subject} className="w-full h-full object-cover" />
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-semibold">{practice.subject}</h3>
-                <p className="text-sm text-gray-500 mt-1">{practice.totalTopics} Topics</p>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-gray-400">Recommended: {practice.durationInMin} mins</span>
-                  <button onClick={(ev) => { ev.stopPropagation(); openSubject(practice.id); }} className="text-sm bg-blue-500 text-white px-3 py-1 rounded">View Topics</button>
+        {isLoading && <div className="text-gray-500">Loading practices...</div>}
+        {isError && <div className="text-red-500">Failed to load practices.</div>}
+        {!isLoading && !isError && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {practices.map((practice) => (
+              <article key={practice.id} className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-shadow" onClick={() => openSubject(practice.id)}>
+                <div className="h-44 bg-gray-200">
+                  <img src={practice.subjImage} alt={practice.subject} className="w-full h-full object-cover" />
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold">{practice.subject}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{practice.totalTopics} Topics</p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-xs text-gray-400">Recommended: {practice.durationInMin} mins</span>
+                    <button onClick={(ev) => { ev.stopPropagation(); openSubject(practice.id); }} className="text-sm bg-blue-500 text-white px-3 py-1 rounded">View Topics</button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
         
       </div>
     </div>

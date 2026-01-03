@@ -1,19 +1,41 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function Signup() {
-  const classes = ['9th','10th','11th','12th','12th Pass'];
+  // const classes = ['9th','10th','11th','12th','12th Pass'];
   const [name, setName] = useState('');
   const [selectedClass, setSelectedClass] = useState('9th');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [exam, setExam] = useState('JEE Advanced');
   const [agree, setAgree] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const { signupUser } = useAuth();
 
   const navigate = useNavigate();
 
-  function handleSignup() {
-    // For now we only navigate to dashboard. Real signup logic (API) can be added later.
-    navigate('/dashboard');
+  async function handleSignup(e) {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+    try {
+      await signupUser({
+        mobile: phone,
+        full_name: name,
+        password,
+        grade: selectedClass,
+        role: 'STUDENT',
+      });
+      navigate('/dashboard');
+    } catch (err) {
+      const message = err?.response?.data?.detail || 'Unable to sign up';
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -24,7 +46,7 @@ export default function Signup() {
           <p className="mt-2 text-sm text-gray-600">Already have an account? <Link to="/" className="text-blue-600 font-medium">Login</Link></p>
         </div>
 
-        <form className="mt-8 space-y-6 bg-white p-8 rounded-2xl shadow-lg">
+        <form className="mt-8 space-y-6 bg-white p-8 rounded-2xl shadow-lg" onSubmit={handleSignup}>
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
             <div className="mt-1 relative rounded-full shadow-sm">
@@ -65,6 +87,23 @@ export default function Signup() {
           </div>
 
           <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <div className="mt-1 relative rounded-full shadow-sm">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="appearance-none block w-full px-12 py-3 border border-gray-200 rounded-full placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-transparent"
+                required
+              />
+              <div className="absolute left-4 top-3 text-gray-400 pr-2">🔒</div>
+            </div>
+          </div>
+
+          <div>
             <label htmlFor="exam" className="block text-sm font-medium text-gray-700">Which exam are you preparing for?</label>
             <select
               id="exam"
@@ -86,14 +125,15 @@ export default function Signup() {
             <label htmlFor="agree" className="text-sm text-gray-600">By signing up you agree to our <a href="#" className="text-blue-600 underline">Terms of use</a> and <a href="#" className="text-blue-600 underline">Privacy Policy</a></label>
           </div>
 
+          {error && <div className="text-red-500 text-sm">{error}</div>}
+
           <div>
             <button
-              type="button"
-              onClick={handleSignup}
-              disabled={!agree}
+              type="submit"
+              disabled={!agree || submitting}
               className={`w-full py-3 rounded-full text-white font-semibold ${agree ? 'bg-blue-500 hover:bg-blue-600' : 'bg-gray-300 cursor-not-allowed'}`}
             >
-              Signup
+              {submitting ? 'Signing up...' : 'Signup'}
             </button>
           </div>
 

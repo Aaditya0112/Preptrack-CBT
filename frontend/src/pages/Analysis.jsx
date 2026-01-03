@@ -61,7 +61,7 @@ export default function Analysis() {
   const attempt_data = submissionResult.attempt.answers || {}
    const sections = [...new Set(
     attempt_data
-      .map((s) => s.question_detail.section)
+      .map((s) => s.question_detail?.section != null ? s.question_detail.section : null)
       .filter((section) => section !== null)
   )]
   const questions = [...new Set(

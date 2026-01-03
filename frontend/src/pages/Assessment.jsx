@@ -9,7 +9,7 @@ import AlertModal from '../components/AlertModal.jsx';
 import ConfirmationModal from '../components/ConfirmationModal.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import EXAMS from '../data/examsList.js';
-import { submitAnswers } from '../api/index.js';
+import { submitAnswers, updateAttemptStatus } from '../api/index.js';
 
 // Default initialState is defined inside the reducer util
 
@@ -166,8 +166,18 @@ export default function AssessmentPage({ user, exam, onExit }) {
     setShowExitConfirmation(true);
   };
 
-  const handleConfirmExit = () => {
+  const handleConfirmExit = async () => {
     setShowExitConfirmation(false);
+
+    // Mark attempt as incomplete/ended without full submit
+    if (attemptIdFromState) {
+      try {
+        await updateAttemptStatus(attemptIdFromState, 'incomplete');
+      } catch (err) {
+        console.warn('Failed to update attempt status on exit', err);
+      }
+    }
+
     if (onExit) {
       onExit();
     } else {
