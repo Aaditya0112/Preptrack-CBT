@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: preptrack-backend
+    runtime: python
+    buildCommand: pip install -r backendWithAuth/requirements.txt && cd backendWithAuth && python manage.py migrate
+    startCommand: cd backendWithAuth && gunicorn backendWithAuth.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: 'false'
+      - key: ALLOWED_HOSTS
+        value: 'preptrack-backend.onrender.com'
+      - key: CORS_ALLOWED_ORIGINS
+        value: 'https://your-frontend-domain.com'
+      - key: CSRF_TRUSTED_ORIGINS
+        value: 'https://your-frontend-domain.com'
+      - key: COOKIE_SECURE
+        value: 'true'
+      - key: COOKIE_SAMESITE
+        value: 'Lax'
+databases:
+  - name: preptrack_db
+    databaseName: preptrack_db
+    user: preptrack_db_user
+    plan: free

@@ -1,15 +1,16 @@
 from decouple import config
 import os
 from pathlib import Path
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'replace-this-with-a-secure-secret'
+SECRET_KEY = config('SECRET_KEY', default='replace-this-with-a-secure-secret')
 
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool, default=True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,23 +58,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backendWithAuth.wsgi.application'
 
+# Use DATABASE_URL from Render if available, else fallback to local config
+
 DATABASES = {
-    'default': {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "preptrack_db_final",
-        "USER": config('DATABASE_USER'),
-        "PASSWORD": config('DATABASE_PASSWORD'),
-        "HOST": "localhost",
-        "PORT": config('DATABASE_PORT', cast=int),
-    }, 
-    'old' : {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "preptrack_db2",
-        "USER": config('DATABASE_USER'),
-        "PASSWORD": config('DATABASE_PASSWORD'),
-        "HOST": "localhost",
-        "PORT": config('DATABASE_PORT', cast=int),
-    }
+    # 'default': {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": "preptrack_db_final",
+    #     "USER": config('DATABASE_USER'),
+    #     "PASSWORD": config('DATABASE_PASSWORD'),
+    #     "HOST": "localhost",
+    #     "PORT": config('DATABASE_PORT', cast=int),
+    # }, 
+
+    'default': dj_database_url.config(default=config('DATABASE_URL'), conn_max_age=600),
+
+    # 'old': {
+    #     "ENGINE": "django.db.backends.postgresql",
+    #     "NAME": "preptrack_db2",
+    #     "USER": config('DATABASE_USER'),
+    #     "PASSWORD": config('DATABASE_PASSWORD'),
+    #     "HOST": "localhost",
+    #     "PORT": config('DATABASE_PORT', cast=int),
+    # }
 }
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -94,20 +100,27 @@ AUTH_USER_MODEL = 'accounts.User'
 
 from datetime import timedelta
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-]
+# Parse CORS origins from env var (comma-separated)
+_cors_origins = config(
+    'CORS_ALLOWED_ORIGINS',
+    default='http://localhost:5173,http://127.0.0.1:5173',
+    cast=lambda x: [origin.strip() for origin in x.split(',')]
+)
+CORS_ALLOWED_ORIGINS = _cors_origins
 CORS_ALLOW_CREDENTIALS = True
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-]
+
+# Parse CSRF origins from env var (comma-separated)
+_csrf_origins = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='http://localhost:5173,http://127.0.0.1:5173',
+    cast=lambda x: [origin.strip() for origin in x.split(',')]
+)
+CSRF_TRUSTED_ORIGINS = _csrf_origins
 
 ACCESS_TOKEN_COOKIE_NAME = 'access'
 REFRESH_TOKEN_COOKIE_NAME = 'refresh'
-COOKIE_SECURE = False  # set to True in production with HTTPS
-COOKIE_SAMESITE = 'Lax'
+COOKIE_SECURE = config('COOKIE_SECURE', default=False, cast=bool)
+COOKIE_SAMESITE = config('COOKIE_SAMESITE', default='Lax')
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
