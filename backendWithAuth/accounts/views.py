@@ -17,8 +17,8 @@ from .serializers import RegisterSerializer, UserSerializer
 def _set_auth_cookies(response, refresh: RefreshToken):
     """Attach access/refresh JWTs to HttpOnly cookies."""
     access_token = refresh.access_token
-    secure = getattr(settings, 'COOKIE_SECURE', False)
-    samesite = getattr(settings, 'COOKIE_SAMESITE', 'Lax')
+    secure = getattr(settings, 'COOKIE_SECURE', True)
+    samesite = getattr(settings, 'COOKIE_SAMESITE', 'None')
     access_max_age = int(settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds())
     refresh_max_age = int(settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds())
 
