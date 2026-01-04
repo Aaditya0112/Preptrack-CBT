@@ -8,10 +8,18 @@ const getCookie = (name) => {
   return match ? decodeURIComponent(match[1]) : null;
 };
 
+// Determine base URL based on environment
+const getBaseURL = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl;
+  // Fallback: use relative path for same-origin requests
+  return '/api';
+};
+
 // Create an axios instance with a base URL for your backend.
 // This makes it easy to manage your API endpoints.
 const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: getBaseURL(),
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
