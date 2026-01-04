@@ -62,30 +62,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backendWithAuth.wsgi.application'
 
 # Use DATABASE_URL from Render if available, else fallback to local config
-if os.getenv('DATABASE_URL'):
+
     # Running on Render - DATABASE_URL is set automatically
-    DATABASES = {
-        'default': dj_database_url.config(conn_max_age=600)
-    }
-else:
-    # Running locally
-    postgres_conn = config('POSTGRES_CONN', default='')
-    if postgres_conn:
-        DATABASES = {
-            'default': dj_database_url.config(default=postgres_conn, conn_max_age=600)
-        }
-    else:
-        # Fallback to manual config
-        DATABASES = {
-            'default': {
-                "ENGINE": "django.db.backends.postgresql",
-                "NAME": "preptrack_db_final",
-                "USER": config('DATABASE_USER', default='postgres'),
-                "PASSWORD": config('DATABASE_PASSWORD', default=''),
-                "HOST": "localhost",
-                "PORT": config('DATABASE_PORT', cast=int, default=5433),
-            }
-        }
+DATABASES = {
+    'default': dj_database_url.config('DATABASE_URL')
+}
+
 
 AUTH_PASSWORD_VALIDATORS = []
 
