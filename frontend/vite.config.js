@@ -19,9 +19,15 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: process.env.VITE_API_URL || 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: false,
+        rewrite: (path) => {
+          if (process.env.VITE_API_URL) {
+            return path;
+          }
+          return path;
+        },
       },
     },
   },
