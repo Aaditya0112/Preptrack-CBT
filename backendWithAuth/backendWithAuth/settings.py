@@ -107,11 +107,11 @@ CSRF_TRUSTED_ORIGINS = _csrf_origins
 
 ACCESS_TOKEN_COOKIE_NAME = 'access'
 REFRESH_TOKEN_COOKIE_NAME = 'refresh'
-SESSION_COOKIE_SECURE = config("COOKIE_SECURE", default=False, cast=bool)
-SESSION_COOKIE_SAMESITE = config("COOKIE_SAMESITE", default="Lax")
+SESSION_COOKIE_SECURE = config("COOKIE_SECURE", default=True, cast=bool)
+SESSION_COOKIE_SAMESITE = config("COOKIE_SAMESITE", default="None")
 
-CSRF_COOKIE_SECURE = config("COOKIE_SECURE", default=False, cast=bool)
-CSRF_COOKIE_SAMESITE = config("COOKIE_SAMESITE", default="Lax")
+CSRF_COOKIE_SECURE = config("COOKIE_SECURE", default=True, cast=bool)
+CSRF_COOKIE_SAMESITE = config("COOKIE_SAMESITE", default="None")
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
