@@ -27,18 +27,18 @@ const apiClient = axios.create({
 });
 
 // Request interceptor: inject Authorization from access token cookie when readable.
-apiClient.interceptors.request.use(
-  (config) => {
-    if (!config.headers.Authorization) {
-      const access = getCookie('access');
-      if (access) {
-        config.headers.Authorization = `Bearer ${access}`;
-      }
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// apiClient.interceptors.request.use(
+//   (config) => {
+//     if (!config.headers.Authorization) {
+//       const access = getCookie('access');
+//       if (access) {
+//         config.headers.Authorization = `Bearer ${access}`;
+//       }
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
 // Response interceptor to handle token expiration
 apiClient.interceptors.response.use(
@@ -94,7 +94,8 @@ export const login = (credentials) => {
 };
 
 export const logout = () => {
-  return apiClient.post('/accounts/logout/');
+  return apiClient.post('/accounts/logout/', 
+  );
 };
 
 export const refreshAccessToken = (refreshToken) => {

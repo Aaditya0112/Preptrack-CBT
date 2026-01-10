@@ -90,8 +90,7 @@ from datetime import timedelta
 # Parse CORS origins from env var (comma-separated)
 # For testing, allow all origins; restrict in production
 _cors_origins = config(
-    'CORS_ALLOWED_ORIGINS',
-    default='*',  # Allow all origins for testing
+    'CORS_ALLOWED_ORIGINS',  # Allow all origins for testing
     cast=lambda x: [origin.strip() for origin in x.split(',')]
 )
 CORS_ALLOWED_ORIGINS = _cors_origins
